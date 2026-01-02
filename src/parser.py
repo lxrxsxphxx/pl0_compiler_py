@@ -1,5 +1,27 @@
-from lexer import Lexer
 from ast_nodes import *
+
+'''
+Parser module for parsing tokens into an Abstract Syntax Tree (AST).
+
+scope:
+Parse tokens into AST nodes
+Handle grammar rules
+
+parser.py
+├── Parser (Klasse)
+│   ├── __init__()
+│   ├── current()
+│   ├── consume()
+│   ├── program()
+│   ├── block()
+│   ├── statement()
+│   ├── condition()
+│   ├── expression()
+│   ├── term()
+│   ├── factor()
+
+
+'''
 
 class Parser:
     def __init__(self, tokens):
@@ -194,14 +216,14 @@ class Parser:
         if self.current().type in ("PLUS", "MINUS"):
             op = self.current().type
             self.consume(op)
-            node = UnaryOp(op, self.parse_term())
+            node = UnaryOp(op, self.term())
         else:
-            node = self.parse_term()
+            node = self.term()
 
         while self.current().type in ("PLUS", "MINUS"):
             op = self.current().type
             self.consume(op)
-            right = self.parse_term()
+            right = self.term()
             node = BinaryOp(op, node, right)
 
         return node
@@ -209,12 +231,12 @@ class Parser:
 
     def term(self):
         #term       = factor { ( "*" | "/" ) factor } .
-        node = self.parse_factor()
+        node = self.factor()
 
         while self.current().type in ("TIMES", "SLASH"):
             op = self.current().type
             self.consume(op)
-            right = self.parse_factor()
+            right = self.factor()
             node = BinaryOp(op, node, right)
 
         return node
@@ -235,7 +257,7 @@ class Parser:
 
         elif tok.type == "LPAREN":
             self.consume("LPAREN")
-            expr = self.parse_expression()
+            expr = self.expression()
             self.consume("RPAREN")
             return expr
 
